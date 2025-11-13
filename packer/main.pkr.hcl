@@ -16,7 +16,7 @@ packer {
         ssh_username = "ec2-user"
         ami_name = local.image_name
 
-        tags {
+        tags = {
             Name =  local.image_name
             Project = var.project_name
             Environment = var.project_environment
@@ -26,17 +26,17 @@ packer {
  build {
         sources = ["source.amazon-ebs.image"]
 
-        provisioners "shell" {
+        provisioner "shell" {
             script = "./provision.sh"
             execute_command = "sudo {{.Path}}"
         }    
-        provisioners "file"{
+        provisioner "file"{
             source = "../website"
             destination = "/tmp"
             
         }
-        provisioners "shell"{
-            inline [
+        provisioner "shell"{
+            inline = [
                 "sudo cp -r /tmp/website/* /var/www/html/",
                 "sudo chown -R apache:apache /var/www/html/",
                 "sudo rm -rf /tmp/website"
