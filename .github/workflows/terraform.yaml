@@ -1,0 +1,46 @@
+---
+name: "Deploy infrastructure with terraform"
+on:
+  workflow_dispatch:
+jobs:
+
+  image-build-job:
+    name: "Instance build with packer"
+
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY: ${{ secrets.access_key }}
+      AWS_SECRET_KEY: ${{ secrets.secret_key }}
+      AWS_REGION: "ap-south-1"
+      TERRAFORM_VERSION: "1.13.5"
+
+    steps:
+    
+      - name: "Repo checkout"
+        uses: actions/checkout@v5
+
+      - name: "installing terrform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          version: ${{ env.TERRAFORM_VERSION }} # Specify the desired Packer version, or use 'latest'
+
+      - name: "terraform initialization"
+        run: terraform init 
+        working-directory: ./terraform/
+      
+      - name: "terraform fmt"  
+        run: terraform fmt
+        working-directory: ./terraform/
+
+      - name: "terraform validate"
+        run: terraform validate
+        working-directory: ./terraform/
+
+      - name: "terraform plan"
+        run: terraform plan
+        working-directory: ./terraform/
+
+      - name: "terraform apply"
+        run: terraform apply -auto-approve
+        working-directory: ./terraform/
+
